@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Distribución Interactiva de Ingresos Mensuales</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -82,107 +82,162 @@
     <div id="inputsContainer">
         <div class="input-group">
             <label for="inversion">Inversión (%):</label>
-            <input type="number" id="inversion" min="0" max="100" step="0.1" value="20">
-            <input type="range" id="inversionSlider" min="0" max="100" step="0.1" value="20">
+            <input type="number" id="inversion" min="0" max="100" step="0.1" value="20" />
+            <input type="range" id="inversionSlider" min="0" max="100" step="0.1" value="20" />
         </div>
         <div class="input-group">
             <label for="gastosFijos">Gastos fijos (%):</label>
-            <input type="number" id="gastosFijos" min="0" max="100" step="0.1" value="40">
-            <input type="range" id="gastosFijosSlider" min="0" max="100" step="0.1" value="40">
+            <input type="number" id="gastosFijos" min="0" max="100" step="0.1" value="40" />
+            <input type="range" id="gastosFijosSlider" min="0" max="100" step="0.1" value="40" />
         </div>
         <div class="input-group">
             <label for="gastosVariables">Gastos variables (%):</label>
-            <input type="number" id="gastosVariables" min="0" max="100" step="0.1" value="25">
-            <input type="range" id="gastosVariablesSlider" min="0" max="100" step="0.1" value="25">
+            <input type="number" id="gastosVariables" min="0" max="100" step="0.1" value="25" />
+            <input type="range" id="gastosVariablesSlider" min="0" max="100" step="0.1" value="25" />
         </div>
         <div class="input-group">
             <label for="ahorro">Ahorro para emergencias (%):</label>
-            <input type="number" id="ahorro" min="0" max="100" step="0.1" value="10">
-            <input type="range" id="ahorroSlider" min="0" max="100" step="0.1" value="10">
+            <input type="number" id="ahorro" min="0" max="100" step="0.1" value="10" />
+            <input type="range" id="ahorroSlider" min="0" max="100" step="0.1" value="10" />
         </div>
         <div class="input-group">
             <label for="deudas">Deudas (%):</label>
-            <input type="number" id="deudas" min="0" max="100" step="0.1" value="5">
-            <input type="range" id="deudasSlider" min="0" max="100" step="0.1" value="5">
+            <input type="number" id="deudas" min="0" max="100" step="0.1" value="5" />
+            <input type="range" id="deudasSlider" min="0" max="100" step="0.1" value="5" />
         </div>
-        <div id="sumWarning">La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%</div>
+        <div id="sumWarning">
+            La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%
+        </div>
     </div>
 
     <script>
+        const apiUrl =
+          'https://script.google.com/macros/s/AKfycbzZxP72qrXUvKsOVJmgs3LFVkQ8gRcifaL7Rw4IxemLHPpqlH2Ty-iAEoiNndAIMdEE/exec';
+
         const categories = [
-            { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },           // Teal
-            { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },      // Red
-            { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' }, // Orange
-            { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' }, // Blue
-            { id: 'deudas', label: 'Deudas', color: '#22577a' }                  // Deep Orange
+          { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },
+          { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },
+          { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' },
+          { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' },
+          { id: 'deudas', label: 'Deudas', color: '#22577a' },
         ];
 
         const ctx = document.getElementById('incomeChart').getContext('2d');
         const chart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: categories.map(cat => `${cat.label} (${document.getElementById(cat.id).value}%)`),
-                datasets: [{
-                    data: categories.map(cat => parseFloat(document.getElementById(cat.id).value)),
-                    backgroundColor: categories.map(cat => cat.color),
-                    borderColor: '#fff',
-                    borderWidth: 2,
-                    hoverOffset: 10
-                }]
+          type: 'pie',
+          data: {
+            labels: categories.map(
+              (cat) => `${cat.label} (${document.getElementById(cat.id).value}%)`
+            ),
+            datasets: [
+              {
+                data: categories.map(
+                  (cat) => parseFloat(document.getElementById(cat.id).value)
+                ),
+                backgroundColor: categories.map((cat) => cat.color),
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 10,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: {
+                    size: 14,
+                    family: 'Segoe UI',
+                  },
+                  color: '#444',
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => `${context.label}: ${context.raw}%`,
+                },
+              },
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Segoe UI'
-                            },
-                            color: '#444'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: context => `${context.label}: ${context.raw}%`
-                        }
-                    }
-                }
-            }
+          },
         });
 
         function updateChart() {
-            const values = categories.map(cat => parseFloat(document.getElementById(cat.id).value) || 0);
-            const sum = values.reduce((a, b) => a + b, 0);
-            const sumWarning = document.getElementById('sumWarning');
-            const sumValue = document.getElementById('sumValue');
-            sumValue.textContent = sum.toFixed(1);
-            sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
+          const values = categories.map(
+            (cat) => parseFloat(document.getElementById(cat.id).value) || 0
+          );
+          const sum = values.reduce((a, b) => a + b, 0);
+          const sumWarning = document.getElementById('sumWarning');
+          const sumValue = document.getElementById('sumValue');
+          sumValue.textContent = sum.toFixed(1);
+          sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
 
-            let normalizedValues = values;
-            if (Math.abs(sum - 100) > 0.1 && sum > 0) {
-                normalizedValues = values.map(val => (val / sum * 100).toFixed(1));
-            }
+          let normalizedValues = values;
+          if (Math.abs(sum - 100) > 0.1 && sum > 0) {
+            normalizedValues = values.map((val) => (val / sum) * 100);
+          }
 
-            chart.data.labels = categories.map((cat, i) => `${cat.label} (${normalizedValues[i]}%)`);
-            chart.data.datasets[0].data = normalizedValues;
-            chart.update();
+          chart.data.labels = categories.map(
+            (cat, i) => `${cat.label} (${normalizedValues[i].toFixed(1)}%)`
+          );
+          chart.data.datasets[0].data = normalizedValues;
+          chart.update();
         }
 
-        categories.forEach(cat => {
-            const input = document.getElementById(cat.id);
-            const slider = document.getElementById(`${cat.id}Slider`);
-            input.addEventListener('input', () => {
-                slider.value = input.value;
-                updateChart();
+        // Carga datos guardados desde API
+        async function loadData() {
+          try {
+            const res = await fetch(apiUrl);
+            const savedValues = await res.json();
+
+            if (!savedValues || savedValues.length !== categories.length) return;
+
+            categories.forEach((cat, i) => {
+              document.getElementById(cat.id).value = savedValues[i];
+              document.getElementById(cat.id + 'Slider').value = savedValues[i];
             });
-            slider.addEventListener('input', () => {
-                input.value = slider.value;
-                updateChart();
+
+            updateChart();
+          } catch (e) {
+            console.warn('No se pudo cargar datos guardados', e);
+          }
+        }
+
+        // Guarda datos al backend
+        async function saveData() {
+          const data = {};
+          categories.forEach((cat) => {
+            data[cat.id] = parseFloat(document.getElementById(cat.id).value) || 0;
+          });
+
+          try {
+            await fetch(apiUrl, {
+              method: 'POST',
+              body: JSON.stringify(data),
+              headers: { 'Content-Type': 'application/json' },
             });
+          } catch (e) {
+            console.warn('No se pudo guardar datos', e);
+          }
+        }
+
+        categories.forEach((cat) => {
+          const input = document.getElementById(cat.id);
+          const slider = document.getElementById(cat.id + 'Slider');
+          input.addEventListener('input', () => {
+            slider.value = input.value;
+            updateChart();
+            saveData();
+          });
+          slider.addEventListener('input', () => {
+            input.value = slider.value;
+            updateChart();
+            saveData();
+          });
         });
 
+        loadData();
         updateChart();
     </script>
 </body>
