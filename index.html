@@ -1,214 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Distribución Interactiva de Ingresos Mensuales</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 30px 20px;
-            background-color: #f9fafb;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Distribución Interactiva de Ingresos Mensuales</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px 20px;
+      background-color: #f9fafb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+    }
 
-        h1 {
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
 
-        #chartContainer {
-            max-width: 600px;
-            width: 100%;
-            margin-bottom: 30px;
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
+    #chartContainer {
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 30px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
 
-        #inputsContainer {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 600px;
-            width: 100%;
-        }
+    #inputsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 600px;
+      width: 100%;
+    }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .input-group label {
-            flex: 1;
-            font-size: 15px;
-        }
+    .input-group label {
+      flex: 1;
+      font-size: 15px;
+    }
 
-        .input-group input[type="number"] {
-            width: 70px;
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+    .input-group input[type="number"] {
+      width: 70px;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
 
-        .input-group input[type="range"] {
-            flex: 2;
-        }
+    .input-group input[type="range"] {
+      flex: 2;
+    }
 
-        #sumWarning {
-            color: #e53935;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-            text-align: center;
-        }
-    </style>
+    #sumWarning {
+      color: #e53935;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <h1>Dalona Interactive Distribution of Monthly Income</h1>
+  <h1>Dalona Interactive Distribution of Monthly Income</h1>
 
-    <div id="chartContainer">
-        <canvas id="incomeChart"></canvas>
+  <div id="chartContainer">
+    <canvas id="incomeChart"></canvas>
+  </div>
+
+  <div id="inputsContainer">
+    <div class="input-group">
+      <label for="inversion">Inversión (%):</label>
+      <input type="number" id="inversion" min="0" max="100" step="0.1">
+      <input type="range" id="inversionSlider" min="0" max="100" step="0.1">
     </div>
-
-    <div id="inputsContainer">
-        <div class="input-group">
-            <label for="inversion">Inversión (%):</label>
-            <input type="number" id="inversion" min="0" max="100" step="0.1" value="20" />
-            <input type="range" id="inversionSlider" min="0" max="100" step="0.1" value="20" />
-        </div>
-        <div class="input-group">
-            <label for="gastosFijos">Gastos fijos (%):</label>
-            <input type="number" id="gastosFijos" min="0" max="100" step="0.1" value="40" />
-            <input type="range" id="gastosFijosSlider" min="0" max="100" step="0.1" value="40" />
-        </div>
-        <div class="input-group">
-            <label for="gastosVariables">Gastos variables (%):</label>
-            <input type="number" id="gastosVariables" min="0" max="100" step="0.1" value="25" />
-            <input type="range" id="gastosVariablesSlider" min="0" max="100" step="0.1" value="25" />
-        </div>
-        <div class="input-group">
-            <label for="ahorro">Ahorro para emergencias (%):</label>
-            <input type="number" id="ahorro" min="0" max="100" step="0.1" value="10" />
-            <input type="range" id="ahorroSlider" min="0" max="100" step="0.1" value="10" />
-        </div>
-        <div class="input-group">
-            <label for="deudas">Deudas (%):</label>
-            <input type="number" id="deudas" min="0" max="100" step="0.1" value="5" />
-            <input type="range" id="deudasSlider" min="0" max="100" step="0.1" value="5" />
-        </div>
-        <div id="sumWarning">
-            La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%
-        </div>
+    <div class="input-group">
+      <label for="gastosFijos">Gastos fijos (%):</label>
+      <input type="number" id="gastosFijos" min="0" max="100" step="0.1">
+      <input type="range" id="gastosFijosSlider" min="0" max="100" step="0.1">
     </div>
+    <div class="input-group">
+      <label for="gastosVariables">Gastos variables (%):</label>
+      <input type="number" id="gastosVariables" min="0" max="100" step="0.1">
+      <input type="range" id="gastosVariablesSlider" min="0" max="100" step="0.1">
+    </div>
+    <div class="input-group">
+      <label for="ahorro">Ahorro para emergencias (%):</label>
+      <input type="number" id="ahorro" min="0" max="100" step="0.1">
+      <input type="range" id="ahorroSlider" min="0" max="100" step="0.1">
+    </div>
+    <div class="input-group">
+      <label for="deudas">Deudas (%):</label>
+      <input type="number" id="deudas" min="0" max="100" step="0.1">
+      <input type="range" id="deudasSlider" min="0" max="100" step="0.1">
+    </div>
+    <div id="sumWarning">La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%</div>
+  </div>
 
-<script>
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbzZxP72qrXUvKsOVJmgs3LFVkQ8gRcifaL7Rw4IxemLHPpqlH2Ty-iAEoiNndAIMdEE/exec';
+  <script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbzZxP72qrXUvKsOVJmgs3LFVkQ8gRcifaL7Rw4IxemLHPpqlH2Ty-iAEoiNndAIMdEE/exec'; // 🔁 Reemplaza con tu URL si cambia
 
     const categories = [
-        { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },
-        { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },
-        { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' },
-        { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' },
-        { id: 'deudas', label: 'Deudas', color: '#22577a' }
+      { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },
+      { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },
+      { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' },
+      { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' },
+      { id: 'deudas', label: 'Deudas', color: '#22577a' }
     ];
 
     const ctx = document.getElementById('incomeChart').getContext('2d');
     const chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: categories.map(cat => `${cat.label} (${document.getElementById(cat.id).value}%)`),
-            datasets: [{
-                data: categories.map(cat => parseFloat(document.getElementById(cat.id).value)),
-                backgroundColor: categories.map(cat => cat.color),
-                borderColor: '#fff',
-                borderWidth: 2,
-                hoverOffset: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Segoe UI'
-                        },
-                        color: '#444'
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: context => `${context.label}: ${context.raw}%`
-                    }
-                }
+      type: 'pie',
+      data: {
+        labels: categories.map(cat => `${cat.label} (0%)`),
+        datasets: [{
+          data: [0, 0, 0, 0, 0],
+          backgroundColor: categories.map(cat => cat.color),
+          borderColor: '#fff',
+          borderWidth: 2,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: {
+                size: 14,
+                family: 'Segoe UI'
+              },
+              color: '#444'
             }
+          },
+          tooltip: {
+            callbacks: {
+              label: context => `${context.label}: ${context.raw}%`
+            }
+          }
         }
+      }
     });
 
     function getCurrentData() {
-        const data = {};
-        categories.forEach(cat => {
-            data[cat.id] = parseFloat(document.getElementById(cat.id).value) || 0;
-        });
-        return data;
+      const data = {};
+      categories.forEach(cat => {
+        data[cat.id] = parseFloat(document.getElementById(cat.id).value) || 0;
+      });
+      return data;
     }
 
     function sendToBackend() {
-        const data = getCurrentData();
-        fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).catch(err => console.error('Error al enviar datos:', err));
+      const data = getCurrentData();
+      fetch(apiUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).catch(err => console.error('Error al enviar datos:', err));
     }
 
     function updateChart() {
-        const values = categories.map(cat => parseFloat(document.getElementById(cat.id).value) || 0);
-        const sum = values.reduce((a, b) => a + b, 0);
-        const sumWarning = document.getElementById('sumWarning');
-        const sumValue = document.getElementById('sumValue');
-        sumValue.textContent = sum.toFixed(1);
-        sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
+      const values = categories.map(cat => parseFloat(document.getElementById(cat.id).value) || 0);
+      const sum = values.reduce((a, b) => a + b, 0);
+      const sumWarning = document.getElementById('sumWarning');
+      const sumValue = document.getElementById('sumValue');
+      sumValue.textContent = sum.toFixed(1);
+      sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
 
-        let normalizedValues = values;
-        if (Math.abs(sum - 100) > 0.1 && sum > 0) {
-            normalizedValues = values.map(val => (val / sum * 100).toFixed(1));
-        }
+      let normalizedValues = values;
+      if (Math.abs(sum - 100) > 0.1 && sum > 0) {
+        normalizedValues = values.map(val => (val / sum * 100).toFixed(1));
+      }
 
-        chart.data.labels = categories.map((cat, i) => `${cat.label} (${normalizedValues[i]}%)`);
-        chart.data.datasets[0].data = normalizedValues;
-        chart.update();
+      chart.data.labels = categories.map((cat, i) => `${cat.label} (${normalizedValues[i]}%)`);
+      chart.data.datasets[0].data = normalizedValues;
+      chart.update();
 
-        sendToBackend(); // ← Aquí enviamos al backend cada vez que se actualiza
+      sendToBackend(); // Enviar al backend cada vez que se actualiza
     }
 
+    function loadFromBackend() {
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (!data || !data.length) return;
+          const values = data[0]; // Solo la primera fila
+          categories.forEach((cat, i) => {
+            const val = parseFloat(values[i]) || 0;
+            document.getElementById(cat.id).value = val;
+            document.getElementById(`${cat.id}Slider`).value = val;
+          });
+          updateChart(); // Refleja los datos en el gráfico
+        })
+        .catch(err => console.error('Error al cargar datos iniciales:', err));
+    }
+
+    // Sincroniza sliders con inputs
     categories.forEach(cat => {
-        const input = document.getElementById(cat.id);
-        const slider = document.getElementById(`${cat.id}Slider`);
-        input.addEventListener('input', () => {
-            slider.value = input.value;
-            updateChart();
-        });
-        slider.addEventListener('input', () => {
-            input.value = slider.value;
-            updateChart();
-        });
+      const input = document.getElementById(cat.id);
+      const slider = document.getElementById(`${cat.id}Slider`);
+      input.addEventListener('input', () => {
+        slider.value = input.value;
+        updateChart();
+      });
+      slider.addEventListener('input', () => {
+        input.value = slider.value;
+        updateChart();
+      });
     });
 
-    updateChart(); // Inicial
-</script>
-
+    loadFromBackend(); // 🔁 Carga inicial desde Google Sheets
+  </script>
 </body>
 </html>
+``
