@@ -17,10 +17,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
         }
+
         h1 {
             font-size: 22px;
             margin-bottom: 20px;
         }
+
         #chartContainer {
             max-width: 600px;
             width: 100%;
@@ -30,6 +32,7 @@
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
+
         #inputsContainer {
             display: flex;
             flex-direction: column;
@@ -37,24 +40,29 @@
             max-width: 600px;
             width: 100%;
         }
+
         .input-group {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .input-group label {
             flex: 1;
             font-size: 15px;
         }
+
         .input-group input[type="number"] {
             width: 70px;
             padding: 6px;
             border-radius: 4px;
             border: 1px solid #ccc;
         }
+
         .input-group input[type="range"] {
             flex: 2;
         }
+
         #sumWarning {
             color: #e53935;
             font-size: 14px;
@@ -97,129 +105,146 @@
             <input type="number" id="deudas" min="0" max="100" step="0.1" value="5" />
             <input type="range" id="deudasSlider" min="0" max="100" step="0.1" value="5" />
         </div>
-        <div id="sumWarning">La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%</div>
+        <div id="sumWarning">
+            La suma de los porcentajes debe ser 100%. Actual: <span id="sumValue"></span>%
+        </div>
     </div>
 
-    <script>
-        const apiUrl = 'https://script.google.com/macros/s/AKfycbzZxP72qrXUvKsOVJmgs3LFVkQ8gRcifaL7Rw4IxemLHPpqlH2Ty-iAEoiNndAIMdEE/exec';'; //  URL desplegada
 
-        const categories = [
-            { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },
-            { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },
-            { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' },
-            { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' },
-            { id: 'deudas', label: 'Deudas', color: '#22577a' }
-        ];
 
-        const ctx = document.getElementById('incomeChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: categories.map(cat => `${cat.label} (%)`),
-                datasets: [{
-                    data: categories.map(() => 0),
-                    backgroundColor: categories.map(cat => cat.color),
-                    borderColor: '#fff',
-                    borderWidth: 2,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Segoe UI'
-                            },
-                            color: '#444'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: context => `${context.label}: ${context.raw}%`
-                        }
+
+
+
+
+
+
+
+
+
+
+<script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbzZxP72qrXUvKsOVJmgs3LFVkQ8gRcifaL7Rw4IxemLHPpqlH2Ty-iAEoiNndAIMdEE/exec';
+
+    const categories = [
+        { id: 'inversion', label: 'Inversión', color: '#c7f9cc' },
+        { id: 'gastosFijos', label: 'Gastos fijos', color: '#38a3a5' },
+        { id: 'gastosVariables', label: 'Gastos variables', color: '#57cc99' },
+        { id: 'ahorro', label: 'Ahorro para emergencias', color: '#80ed99' },
+        { id: 'deudas', label: 'Deudas', color: '#22577a' }
+    ];
+
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: categories.map(cat => `${cat.label} (${document.getElementById(cat.id).value}%)`),
+            datasets: [{
+                data: categories.map(cat => parseFloat(document.getElementById(cat.id).value)),
+                backgroundColor: categories.map(cat => cat.color),
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 14,
+                            family: 'Segoe UI'
+                        },
+                        color: '#444'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: context => `${context.label}: ${context.raw}%`
                     }
                 }
             }
-        });
 
-        let isInitializing = true;
 
-        function updateChart() {
-          const values = categories.map(cat => parseFloat(document.getElementById(cat.id).value) || 0);
-          const sum = values.reduce((a, b) => a + b, 0);
-          const sumWarning = document.getElementById('sumWarning');
-          const sumValue = document.getElementById('sumValue');
-          sumValue.textContent = sum.toFixed(1);
-          sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
 
-          let normalizedValues = values;
-          if (Math.abs(sum - 100) > 0.1 && sum > 0) {
-            normalizedValues = values.map(val => (val / sum * 100).toFixed(1));
-          }
 
-          chart.data.labels = categories.map((cat, i) => `${cat.label} (${normalizedValues[i]}%)`);
-          chart.data.datasets[0].data = normalizedValues;
-          chart.update();
 
-          if (!isInitializing) {
-            sendToBackend(); // ✅ solo guarda si ya se terminó de inicializar
-          }
+
         }
 
-        function sendToBackend() {
-            const data = {};
-            categories.forEach(cat => {
-                data[cat.id] = parseFloat(document.getElementById(cat.id).value) || 0;
-            });
+    });
 
-            fetch(apiUrl, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .catch(err => console.error('Error guardando en backend:', err));
-        }
-
-        function loadFromBackend() {
-          fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-              if (!data || !data.length) return;
-              const values = data[0];
-              categories.forEach((cat, i) => {
-                const val = parseFloat(values[i]) || 0;
-                document.getElementById(cat.id).value = val;
-                document.getElementById(`${cat.id}Slider`).value = val;
-              });
-
-              isInitializing = false; // ✅ Ya terminó de cargar
-              updateChart();          // Ahora sí podemos guardar si se cambia algo
-            })
-            .catch(err => {
-              console.error('Error al cargar datos iniciales:', err);
-              isInitializing = false;
-            });
-        }
-
+    function getCurrentData() {
+        const data = {};
         categories.forEach(cat => {
-            const input = document.getElementById(cat.id);
-            const slider = document.getElementById(`${cat.id}Slider`);
-            input.addEventListener('input', () => {
-                slider.value = input.value;
-                updateChart();
-            });
-            slider.addEventListener('input', () => {
-                input.value = slider.value;
-                updateChart();
-            });
+            data[cat.id] = parseFloat(document.getElementById(cat.id).value) || 0;
         });
+        return data;
+    }
 
-        loadFromBackend();
-    </script>
+    function sendToBackend() {
+        const data = getCurrentData();
+        fetch(apiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).catch(err => console.error('Error al enviar datos:', err));
+    }
+
+    function updateChart() {
+        const values = categories.map(cat => parseFloat(document.getElementById(cat.id).value) || 0);
+        const sum = values.reduce((a, b) => a + b, 0);
+        const sumWarning = document.getElementById('sumWarning');
+        const sumValue = document.getElementById('sumValue');
+        sumValue.textContent = sum.toFixed(1);
+        sumWarning.style.display = Math.abs(sum - 100) > 0.1 ? 'block' : 'none';
+
+        let normalizedValues = values;
+        if (Math.abs(sum - 100) > 0.1 && sum > 0) {
+            normalizedValues = values.map(val => (val / sum * 100).toFixed(1));
+        }
+
+        chart.data.labels = categories.map((cat, i) => `${cat.label} (${normalizedValues[i]}%)`);
+        chart.data.datasets[0].data = normalizedValues;
+        chart.update();
+
+
+
+
+        sendToBackend(); // ← Aquí enviamos al backend cada vez que se actualiza
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+    categories.forEach(cat => {
+        const input = document.getElementById(cat.id);
+        const slider = document.getElementById(`${cat.id}Slider`);
+        input.addEventListener('input', () => {
+            slider.value = input.value;
+            updateChart();
+        });
+        slider.addEventListener('input', () => {
+            input.value = slider.value;
+            updateChart();
+        });
+    });
+
+    updateChart(); // Inicial
+</script>
+
 </body>
 </html>
